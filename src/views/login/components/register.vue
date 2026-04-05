@@ -268,31 +268,118 @@ const handleGoLogin = () => {
 .register-form {
   margin-top: 40px;
   padding: 0 30px;
-  :deep(.ant-form-item-label) {
-    padding-bottom: 8px;
-    label {
-      font-weight: 500;
-      color: #131313;
+
+  // 输入框聚焦样式
+  :deep(.ant-input-affix-wrapper),
+  :deep(.ant-input),
+  :deep(.ant-select .ant-select-selector) {
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      border-color: #1890ff;
+    }
+
+    &:focus,
+    &.ant-input-affix-wrapper-focused,
+    &.ant-select-focused {
+      border-color: #1890ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.15);
     }
   }
-  :deep(.ant-form-item) {
-    margin-bottom: 24px;
+
+  // 输入框密码眼睛图标
+  :deep(.ant-input-password-icon) {
+    color: #8c8c8c;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #1890ff;
+    }
   }
+
+  :deep(.ant-form-item-label) {
+    padding-bottom: 8px;
+
+    label {
+      font-weight: 500;
+      color: #262626;
+      font-size: 14px;
+    }
+  }
+
+  :deep(.ant-form-item) {
+    margin-bottom: 20px;
+  }
+
+  // 验证成功状态
+  :deep(.ant-form-item-has-success) {
+    .ant-input-affix-wrapper,
+    .ant-input {
+      border-color: #52c41a;
+    }
+  }
+
+  // 验证错误状态
+  :deep(.ant-form-item-has-error) {
+    .ant-input-affix-wrapper,
+    .ant-input {
+      border-color: #ff4d4f;
+      box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.1);
+    }
+  }
+
   .back-login {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    font-size: 14px;
+    color: #8c8c8c;
+
+    a {
+      color: #1890ff;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #40a9ff;
+      }
+    }
   }
+
   .avatar-upload {
+    display: flex;
+    justify-content: center;
+
     .avatar-upload-area {
       position: relative;
-      width: 120px;
-      height: 120px;
-      border: 2px dashed #d9d9d9;
-      border-radius: 8px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
       cursor: pointer;
-      transition: all 0.3s;
       overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(135deg, #f0f2f5 0%, #e8eaed 100%);
+
+      // 精致边框效果
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 3px;
+        border-radius: 50%;
+        border: 2px dashed #d9d9d9;
+        transition: all 0.3s;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      &:hover {
+        transform: scale(1.03);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+        &::before {
+          border-color: #1890ff;
+        }
+      }
 
       .avatar-preview {
         width: 100%;
@@ -307,18 +394,23 @@ const handleGoLogin = () => {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        background-color: #fafafa;
-        gap: 10px;
+        gap: 6px;
+        background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
 
         .upload-icon {
-          font-size: 32px;
-          margin-bottom: 8px;
+          font-size: 28px;
+          color: #8c8c8c;
+          transition: all 0.3s;
         }
 
         .upload-text {
-          font-size: 14px;
-          color: #666;
+          font-size: 12px;
+          color: #8c8c8c;
         }
+      }
+
+      &:hover .avatar-placeholder .upload-icon {
+        color: #1890ff;
       }
 
       .upload-mask {
@@ -327,12 +419,56 @@ const handleGoLogin = () => {
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background: linear-gradient(
+          135deg,
+          rgba(24, 144, 255, 0.85) 0%,
+          rgba(64, 169, 255, 0.85) 100%
+        );
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 1;
+        z-index: 2;
+        opacity: 0;
+        transition: opacity 0.3s;
+
+        .anticon {
+          color: #fff;
+          font-size: 24px;
+        }
       }
+
+      &:hover .upload-mask {
+        opacity: 1;
+      }
+    }
+  }
+
+  // 注册按钮
+  :deep(.ant-btn-primary) {
+    height: 44px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      background: linear-gradient(135deg, #40a9ff 0%, #69c0ff 100%);
+      box-shadow: 0 6px 20px rgba(24, 144, 255, 0.4);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+    }
+
+    &[disabled] {
+      background: #f5f5f5;
+      box-shadow: none;
+      color: #bfbfbf;
     }
   }
 }

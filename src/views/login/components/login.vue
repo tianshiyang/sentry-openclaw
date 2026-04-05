@@ -92,20 +92,87 @@ const handleGoRegister = async () => {
 .login-form {
   margin-top: 40px;
   padding: 0 30px;
+
   :deep(.ant-form-item-label) {
     padding-bottom: 8px;
+
     label {
       font-weight: 500;
-      color: #131313;
+      color: #374151;
+      font-size: 14px;
     }
   }
+
   :deep(.ant-form-item) {
     margin-bottom: 24px;
   }
+
+  :deep(.ant-input),
+  :deep(.ant-input-password) {
+    height: 44px;
+    border-radius: 8px;
+    border-color: #e5e7eb;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: #6366f1;
+    }
+
+    &:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+    }
+  }
+
+  :deep(.ant-input-password) {
+    .ant-input {
+      height: 42px;
+    }
+  }
+
   .create-account {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    font-size: 14px;
+    color: #6b7280;
+
+    :deep(.ant-btn-link) {
+      color: #6366f1;
+      font-weight: 500;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: #4f46e5;
+      }
+    }
+  }
+
+  :deep(.ant-btn-primary) {
+    height: 48px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border: none;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    }
+
+    &:disabled {
+      background: #e5e7eb;
+      box-shadow: none;
+    }
   }
 }
 </style>
