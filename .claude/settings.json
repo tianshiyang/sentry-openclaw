@@ -1,24 +1,48 @@
 {
   "hooks": {
-    "Notification": [
+    "PreToolUse": [
       {
-        "matcher": "",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "osascript -e 'display notification \"Claude needs your attention\" with title \"Claude Code\"'"
+            "command": "CMD=$(cat | jq -r '.tool_input.command // empty') && if echo \"$CMD\" | grep -qE '^(ls|cat|head|tail|wc|find|grep|rg|git\\s+(status|log|diff|show|branch)|echo|pwd|which|file|stat|du|df)\\b'; then echo '{\"permissionDecision\": \"allow\"}'; fi"
           }
         ]
-      }
-    ],
-    "Stop": [
+      },
       {
-        "matcher": "",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/feishu-notify.sh",
-            "timeout": 10
+            "command": "CMD=$(cat | jq -r '.tool_input.command // empty') && if echo \"$CMD\" | grep -qE 'git\\s+(push\\s+--force|push\\s+-f|reset\\s+--hard|clean\\s+-fd|checkout\\s+--\\s+\\.)'; then echo \"BLOCKED: 危险的 git 命令 — $CMD\" >&2; exit 2; fi && if echo \"$CMD\" | grep -qEi '(rm\\s+-rf\\s+/|DROP\\s+TABLE|DROP\\s+DATABASE|mkfs\\.|:\\(\\)\\{:|chmod\\s+-R\\s+777\\s+/|dd\\s+if=.*of=/dev/)'; then echo \"BLOCKED: 危险系统命令 — $CMD\" >&2; exit 2; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CMD=$(cat | jq -r '.tool_input.command // empty') && if echo \"$CMD\" | grep -qE 'find .* -name.*\\|.*grep'; then echo 'SUGGESTION: 使用 fd 或 find -path 替代 find | grep' >&2; exit 2; elif echo \"$CMD\" | grep -qE 'cat .* \\| head'; then echo 'SUGGESTION: 直接使用 head -n N file' >&2; exit 2; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "用户正在尝试执行一个 bash 命令。请检查这个命令是否包含 'rm' 操作。如果包含 rm 且目标是源代码目录（src/、lib/、app/），回答 NO 阻止操作。如果是清理临时文件、node_modules 或 build 产物，回答 YES 允许。"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(cat | jq -r '.tool_input.file_path // empty') && echo \"$FILE\" | grep -qE '(\\.env|\\.lock|secrets\\.yaml|credentials|id_rsa|\\.pem)' && echo \"BLOCKED: 禁止修改敏感文件: $FILE\" >&2 && exit 2 || true"
           }
         ]
       }
@@ -29,7 +53,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "npx prettier --write \"{file_path}\" 2>/dev/null || true"
+            "command": "FILE=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$FILE\" ] && echo \"$FILE\" | grep -qE '\\.(js|ts|jsx|tsx|vue)$' && npx eslint --fix \"$FILE\" 2>/dev/null || true"
           }
         ]
       },
@@ -38,7 +62,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[[ \"{file_path}\" =~ \\.(js|ts|jsx|tsx)$ ]] && npx eslint --fix \"{file_path}\" 2>/dev/null || true"
+            "command": "FILE=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$FILE\" ] && npx prettier --write \"$FILE\" 2>/dev/null || true"
           }
         ]
       },
@@ -47,36 +71,36 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ -f \"{file_path}\" ] && git add \"{file_path}\" 2>/dev/null || true"
+            "command": "FILE=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$FILE\" ] && [ -f \"$FILE\" ] && git add \"$FILE\" 2>/dev/null || true"
           }
         ]
       },
       {
-        "matcher": "Bash",
+        "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] {command}\" >> \"${CLAUDE_PROJECT_DIR:-.}/.claude/command_log.txt\""
+            "command": "FILE=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$FILE\" ] && echo \"$FILE\" | grep -qE '\\.(ts|tsx|vue)$' && ! echo \"$FILE\" | grep -q '__tests__\\|test\\|spec' && TEST_FILE=$(echo \"$FILE\" | sed 's/\\.tsx\\?/.test.&/' | sed 's/\\.test\\.\\./\\.test\\./') && [ -f \"$TEST_FILE\" ] && npx vitest run \"$TEST_FILE\" --reporter=verbose 2>&1 | tail -20 || true"
           }
         ]
       }
     ],
-    "PreToolUse": [
+    "Stop": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"{file_path}\" | grep -qE '(\\.env|\\.lock|secrets\\.yaml|credentials|id_rsa|\\.pem)' && echo \"BLOCKED: Cannot modify protected file: {file_path}\" >&2 && exit 2 || true"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
+            "command": "osascript -e 'display notification \"Claude Code 任务已完成，请查看结果\" with title \"Claude Code\" sound name \"Glass\"'"
+          },
           {
             "type": "command",
-            "command": "echo \"{command}\" | grep -qEi '(rm\\s+-rf\\s+/|DROP\\s+TABLE|DROP\\s+DATABASE|mkfs\\.|:\\(\\)\\{:|chmod\\s+-R\\s+777\\s+/|dd\\s+if=.*of=/dev/)' && echo \"BLOCKED: Dangerous command detected: {command}\" >&2 && exit 2 || true"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/feishu-notify.sh",
+            "timeout": 10
+          },
+          {
+            "type": "agent",
+            "prompt": "请检查最近修改的文件：\n1. 运行 TypeScript 类型检查（tsc --noEmit）\n2. 运行 ESLint 检查\n3. 如果有对应的测试文件，运行测试\n4. 检查是否有遗留的 console.log 或 debugger 语句\n\n报告所有发现的问题。"
           }
         ]
       }
