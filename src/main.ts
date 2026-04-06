@@ -16,9 +16,10 @@ app.use(Antd)
 app.use(createPinia())
 app.use(router)
 
+
 Sentry.init({
   app,
-  dsn: 'https://42522377090b21266f46dc8c2e9585f9@o4511171649929216.ingest.us.sentry.io/4511171654123520',
+  dsn: 'https://7f5597883a4537f6adbfe3cc4a6eaa95@o4511171649929216.ingest.us.sentry.io/4511172643127296',
   // Setting this option to true will send default PII data to Sentry.
   // For example, automatic IP address collection on events
   sendDefaultPii: true,

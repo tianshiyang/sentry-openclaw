@@ -1,4 +1,4 @@
-import Evaluation from './Evaluation.vue'
+import Evaluation from './evaluation.vue'
 import { createFunctionComponent } from '@/utils/createFunctionComponents'
 
 export interface CreateEvaluationOptions {
