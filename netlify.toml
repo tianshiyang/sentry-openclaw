@@ -1,8 +1,4 @@
-[build]
-  command = "npm run build"
-  publish = "dist"
-
-
+# 与 vite dev proxy 一致：保留 /api 前缀转发到后端
 [[redirects]]
   from = "/api/*"
   to = "https://tianshiyang.com/api/:splat"
