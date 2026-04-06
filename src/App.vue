@@ -3,7 +3,7 @@ import { ConfigProvider } from 'ant-design-vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 
 const handleError = () => {
-  throw Error("项目报错了")
+  throw Error('项目报错了')
 }
 </script>
 

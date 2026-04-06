@@ -16,7 +16,6 @@ app.use(Antd)
 app.use(createPinia())
 app.use(router)
 
-
 Sentry.init({
   app,
   dsn: 'https://7f5597883a4537f6adbfe3cc4a6eaa95@o4511171649929216.ingest.us.sentry.io/4511172643127296',
